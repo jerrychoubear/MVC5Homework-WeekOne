@@ -7,6 +7,7 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using MVC5Homework_WeekOne.Models;
+using System.Web.UI;
 
 namespace MVC5Homework_WeekOne.Controllers
 {
@@ -92,6 +93,14 @@ namespace MVC5Homework_WeekOne.Controllers
             }
             ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
             return View(客戶聯絡人);
+        }
+
+        [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
+        public ActionResult 檢查Email是否重複([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 客戶聯絡人)
+        {            
+            return Json(
+                (db.客戶聯絡人.Where( 人 => 人.Email == 客戶聯絡人.Email && 人.Id != 客戶聯絡人.Id)
+                            .FirstOrDefault() == null), JsonRequestBehavior.AllowGet);
         }
 
         // GET: 客戶聯絡人/Delete/5
