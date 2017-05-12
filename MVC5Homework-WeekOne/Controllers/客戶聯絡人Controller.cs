@@ -18,7 +18,7 @@ namespace MVC5Homework_WeekOne.Controllers
         // GET: 客戶聯絡人
         public ActionResult Index()
         {
-            var 客戶聯絡人 = db.客戶聯絡人.Include(客 => 客.客戶資料);
+            var 客戶聯絡人 = db.客戶聯絡人.Where(人 => 人.是否已刪除 == false).Include(客 => 客.客戶資料);
             return View(客戶聯絡人.ToList());
         }
 
@@ -40,8 +40,10 @@ namespace MVC5Homework_WeekOne.Controllers
         // GET: 客戶聯絡人/Create
         public ActionResult Create()
         {
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱");
-            return View();
+            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱");
+            客戶聯絡人 客戶聯絡人 = new 客戶聯絡人();
+            InitDropDownList(客戶聯絡人);
+            return View(客戶聯絡人);
         }
 
         // POST: 客戶聯絡人/Create
@@ -57,8 +59,8 @@ namespace MVC5Homework_WeekOne.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            InitDropDownList(客戶聯絡人);
             return View(客戶聯絡人);
         }
 
@@ -74,7 +76,8 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            InitDropDownList(客戶聯絡人);
             return View(客戶聯絡人);
         }
 
@@ -91,7 +94,8 @@ namespace MVC5Homework_WeekOne.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.客戶Id = new SelectList(db.客戶資料, "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
+            InitDropDownList(客戶聯絡人);
             return View(客戶聯絡人);
         }
 
@@ -136,6 +140,16 @@ namespace MVC5Homework_WeekOne.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private void InitDropDownList(客戶聯絡人 客戶聯絡人)
+        {
+            List<SelectListItem> 客戶清單 = new List<SelectListItem>();
+            foreach (客戶資料 客 in db.客戶資料.Where(客 => 客.是否已刪除 == false))
+            {
+                客戶清單.Add(new SelectListItem { Text = 客.客戶名稱, Value = 客.Id.ToString() });
+            }
+            客戶聯絡人.客戶清單 = 客戶清單;
         }
     }
 }

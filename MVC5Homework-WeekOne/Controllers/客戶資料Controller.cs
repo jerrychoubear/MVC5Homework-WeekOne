@@ -17,7 +17,7 @@ namespace MVC5Homework_WeekOne.Controllers
         // GET: 客戶資料
         public ActionResult Index()
         {
-            return View(db.客戶資料.ToList());
+            return View(db.客戶資料.Where(客 => 客.是否已刪除 == false).ToList());
         }
 
         // GET: 客戶資料/Details/5
@@ -110,9 +110,33 @@ namespace MVC5Homework_WeekOne.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             客戶資料 客戶資料 = db.客戶資料.Find(id);
-            db.客戶資料.Remove(客戶資料);
+
+            if (客戶資料 == null)
+            {
+                return HttpNotFound();
+            }
+            if (db.客戶銀行資訊.Where(銀行 => 銀行.客戶Id == id && 銀行.是否已刪除 == false).Any())
+            {
+                ModelState.AddModelError("客戶Id", "該客戶尚存在有效銀行資訊，不可刪除");
+            }
+            if (db.客戶聯絡人.Where(聯絡人 => 聯絡人.客戶Id == id && 聯絡人.是否已刪除 == false).Any())
+            {
+                ModelState.AddModelError("客戶Id", "該客戶尚存在有效聯絡人資訊，不可刪除");
+            }
+            if (ModelState.IsValid == false)
+            {
+                return View(客戶資料);
+            }
+            
+            客戶資料.是否已刪除 = true;
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public ActionResult Report()
+        {
+            List<客戶聯絡人與銀行帳戶數量一覽表> 客戶聯絡人與銀行帳戶數量一覽表 = db.客戶聯絡人與銀行帳戶數量一覽表.ToList();
+            return View(客戶聯絡人與銀行帳戶數量一覽表);
         }
 
         protected override void Dispose(bool disposing)

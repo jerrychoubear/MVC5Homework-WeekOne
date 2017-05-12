@@ -12,17 +12,11 @@ namespace MVC5Homework_WeekOne.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class 客戶聯絡人
+    public partial class 客戶聯絡人與銀行帳戶數量一覽表
     {
         public int Id { get; set; }
-        public int 客戶Id { get; set; }
-        public string 職稱 { get; set; }
-        public string 姓名 { get; set; }
-        public string Email { get; set; }
-        public string 手機 { get; set; }
-        public string 電話 { get; set; }
-        public bool 是否已刪除 { get; set; }
-    
-        public virtual 客戶資料 客戶資料 { get; set; }
+        public string 客戶名稱 { get; set; }
+        public Nullable<int> 銀行帳戶數量 { get; set; }
+        public Nullable<int> 聯絡人數量 { get; set; }
     }
 }

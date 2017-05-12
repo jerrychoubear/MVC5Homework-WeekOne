@@ -1,5 +1,6 @@
 namespace MVC5Homework_WeekOne.Models
 {
+    using Attributes;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -8,6 +9,7 @@ namespace MVC5Homework_WeekOne.Models
     [MetadataType(typeof(客戶聯絡人MetaData))]
     public partial class 客戶聯絡人
     {
+        public List<SelectListItem> 客戶清單 { get; set; }
     }
     
     public partial class 客戶聯絡人MetaData
@@ -15,6 +17,7 @@ namespace MVC5Homework_WeekOne.Models
         [Required]
         public int Id { get; set; }
 
+        [Display(Name = "客戶")]
         [Required]
         public int 客戶Id { get; set; }
         
@@ -33,7 +36,7 @@ namespace MVC5Homework_WeekOne.Models
         public string Email { get; set; }
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
-        [Phone]
+        [CellPhone]
         public string 手機 { get; set; }
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
