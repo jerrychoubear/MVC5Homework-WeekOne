@@ -56,11 +56,10 @@
           <Property Name="是否已刪除" Type="bit" Nullable="false" />
         </EntityType>
         <!--產生期間發現錯誤:
-警告 6002: 資料表/檢視 'D:\ASP.NET MVC 5 開發實戰 (台北) (20170506~0521)\GITHUBREPO\MVC5HOMEWORK-WEEKONE\MVC5HOMEWORK-WEEKONE\APP_DATA\客戶資料.MDF.dbo.客戶聯絡人與銀行帳戶數量一覽表' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
+警告 6002: 資料表/檢視 'E6F9748117F5DFD825440AE72413209D_20170506~0521)\MVC5HOMEWORK-WEEKONE\MVC5HOMEWORK-WEEKONE\MVC5HOMEWORK-WEEKONE\APP_DATA\客戶資料.MDF.dbo.客戶聯絡人與銀行帳戶數量一覽表' 未定義主索引鍵。已推斷此索引鍵，並將定義建立成唯讀的資料表/檢視。-->
         <EntityType Name="客戶聯絡人與銀行帳戶數量一覽表">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="客戶名稱" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="客戶名稱" Type="nvarchar" MaxLength="50" Nullable="false" />
@@ -213,7 +212,6 @@
         <EntityType Name="客戶聯絡人與銀行帳戶數量一覽表">
           <Key>
             <PropertyRef Name="Id" />
-            <PropertyRef Name="客戶名稱" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="客戶名稱" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
@@ -280,16 +278,16 @@
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
-          <EntitySetMapping Name="客戶聯絡人與銀行帳戶數量一覽表">
-            <EntityTypeMapping TypeName="客戶資料Model.客戶聯絡人與銀行帳戶數量一覽表">
-              <MappingFragment StoreEntitySet="客戶聯絡人與銀行帳戶數量一覽表">
-                <ScalarProperty Name="聯絡人數量" ColumnName="聯絡人數量" />
-                <ScalarProperty Name="銀行帳戶數量" ColumnName="銀行帳戶數量" />
-                <ScalarProperty Name="客戶名稱" ColumnName="客戶名稱" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
+    <EntitySetMapping Name="客戶聯絡人與銀行帳戶數量一覽表">
+      <EntityTypeMapping TypeName="IsTypeOf(客戶資料Model.客戶聯絡人與銀行帳戶數量一覽表)">
+        <MappingFragment StoreEntitySet="客戶聯絡人與銀行帳戶數量一覽表">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="客戶名稱" ColumnName="客戶名稱" />
+          <ScalarProperty Name="銀行帳戶數量" ColumnName="銀行帳戶數量" />
+          <ScalarProperty Name="聯絡人數量" ColumnName="聯絡人數量" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
   </EntityContainerMapping>
 </Mapping></edmx:Mappings>
   </edmx:Runtime>

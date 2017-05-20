@@ -1,4 +1,5 @@
-﻿using MVC5Homework_WeekOne.Models;
+﻿using MVC5Homework_WeekOne.Controllers.ActionFilters;
+using MVC5Homework_WeekOne.Models;
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Mvc;
@@ -11,9 +12,10 @@ namespace MVC5Homework_WeekOne.Controllers
         客戶資料Repository repo2 = RepositoryHelper.Get客戶資料Repository();
 
         // GET: 客戶銀行資訊
-        public ActionResult Index()
+        [TimeSpentActionFilter]
+        public ActionResult Index(string 查詢條件_名稱)
         {
-            var data = repo.All();
+            var data = repo.All(查詢條件_名稱);
             ViewData.Model = data;
             return View();
         }

@@ -1,10 +1,13 @@
-﻿using MVC5Homework_WeekOne.Models;
+﻿using MVC5Homework_WeekOne.Controllers.ActionFilters;
+using MVC5Homework_WeekOne.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
+using ClosedXML.Excel;
+using System.IO;
 
 namespace MVC5Homework_WeekOne.Controllers
 {
@@ -14,12 +17,67 @@ namespace MVC5Homework_WeekOne.Controllers
         客戶聯絡人與銀行帳戶數量一覽表Repository repo2 = RepositoryHelper.Get客戶聯絡人與銀行帳戶數量一覽表Repository();
 
         // GET: 客戶資料
+        [TimeSpentActionFilter]
         public ActionResult Index(string 查詢條件_名稱, string 查詢條件_分類)
-        {            
+        {
             var data = repo.All(查詢條件_名稱, 查詢條件_分類);
             ViewData.Model = data;
             ViewBag.客戶分類清單 = Get客戶分類清單();
             return View();
+        }
+
+        public ActionResult Export(string 查詢條件_名稱, string 查詢條件_分類)
+        {
+            var data = repo.GetExcelData(查詢條件_名稱, 查詢條件_分類);
+            if (data == null)
+            {
+                return Json(new
+                {
+                    IsSuccess = false,
+                    Message = "無資料可匯出"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            using (var workbook = new XLWorkbook())
+            using (var worksheet = workbook.Worksheets.Add("Index"))
+            using (var memoryStream = new MemoryStream())
+            {
+                Guid guid = Guid.NewGuid();
+                worksheet.Range("A1", "A7").Merge();
+                worksheet.Cell("A2").Value = repo.All();
+                workbook.SaveAs(memoryStream);
+                memoryStream.Position = 0;
+                TempData[guid.ToString()] = memoryStream.ToArray();
+
+                if (HttpContext.Request.IsAjaxRequest())
+                {
+                    return Json(new
+                    {
+                        IsSuccess = false,
+                        Message = "無資料可匯出",
+                        @Guid = guid.ToString()
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    return Export(guid.ToString());
+                }
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Export(string guid)
+        {
+            if (guid == null)
+            {
+                return null;
+            }
+            var bytes = TempData[guid] as byte[];
+            if (TempData[guid] == null || bytes == null)
+            {
+                return new HttpNotFoundResult();
+            }
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"客戶資料_{DateTime.Now.ToString("yyyyMMdd_HHmmss")}.xlsx");
         }
 
         // GET: 客戶資料/Details/5

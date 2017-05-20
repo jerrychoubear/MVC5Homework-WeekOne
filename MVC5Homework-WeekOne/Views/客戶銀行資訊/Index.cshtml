@@ -5,10 +5,26 @@
 }
 
 <h2>客戶銀行資訊</h2>
+<br />
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+@using (Html.BeginForm("Index", "客戶銀行資訊", FormMethod.Post, new { id = "formSearch", @class = "form-inline" }))
+{
+    <label for="查詢條件_名稱">銀行名稱</label>
+    <div class="form-group">
+        @Html.TextBox("查詢條件_名稱", null, new { @id = "查詢條件_名稱", @class = "form-control" })
+    </div>
+}
+<br />
+<div class="form-inline">
+    <div class="form-group">
+        <a id="btnFind" class="btn btn-primary">搜尋</a>
+    </div>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+    <div class="form-group">
+        @Html.ActionLink("新增", "Create", null, new { @class = "btn btn-success" })
+    </div>
+</div>
+<br />
 <table class="table">
     <tr>
         <th>
