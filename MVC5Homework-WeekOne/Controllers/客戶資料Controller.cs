@@ -1,12 +1,10 @@
-﻿using System;
+﻿using MVC5Homework_WeekOne.Models;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using MVC5Homework_WeekOne.Models;
 
 namespace MVC5Homework_WeekOne.Controllers
 {
@@ -16,10 +14,11 @@ namespace MVC5Homework_WeekOne.Controllers
         客戶聯絡人與銀行帳戶數量一覽表Repository repo2 = RepositoryHelper.Get客戶聯絡人與銀行帳戶數量一覽表Repository();
 
         // GET: 客戶資料
-        public ActionResult Index()
-        {
-            var data = repo.All().ToList();
+        public ActionResult Index(string 查詢條件_名稱, string 查詢條件_分類)
+        {            
+            var data = repo.All(查詢條件_名稱, 查詢條件_分類);
             ViewData.Model = data;
+            ViewBag.客戶分類清單 = Get客戶分類清單();
             return View();
         }
 
@@ -42,6 +41,9 @@ namespace MVC5Homework_WeekOne.Controllers
         // GET: 客戶資料/Create
         public ActionResult Create()
         {
+            var data = new 客戶資料();
+            data.客戶分類清單 = Get客戶分類清單();
+            ViewData.Model = data;
             return View();
         }
 
@@ -50,7 +52,7 @@ namespace MVC5Homework_WeekOne.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
+        public ActionResult Create([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email,客戶分類")] 客戶資料 客戶資料)
         {
             if (ModelState.IsValid)
             {
@@ -58,6 +60,8 @@ namespace MVC5Homework_WeekOne.Controllers
                 repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
+            客戶資料.客戶分類清單 = Get客戶分類清單();
+            ViewData.Model = 客戶資料;
             return View();
         }
 
@@ -73,6 +77,7 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return HttpNotFound();
             }
+            data.客戶分類清單 = Get客戶分類清單();
             ViewData.Model = data;
             return View();
         }
@@ -82,7 +87,7 @@ namespace MVC5Homework_WeekOne.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
+        public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email,客戶分類")] 客戶資料 客戶資料)
         {
             if (ModelState.IsValid)
             {
@@ -90,7 +95,9 @@ namespace MVC5Homework_WeekOne.Controllers
                 repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            return View(客戶資料);
+            客戶資料.客戶分類清單 = Get客戶分類清單();
+            ViewData.Model = 客戶資料;
+            return View();
         }
 
         // GET: 客戶資料/Delete/5
@@ -105,7 +112,8 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return HttpNotFound();
             }
-            return View(客戶資料);
+            ViewData.Model = 客戶資料;
+            return View();
         }
 
         // POST: 客戶資料/Delete/5
@@ -143,6 +151,17 @@ namespace MVC5Homework_WeekOne.Controllers
             var data = repo2.All();
             ViewData.Model = data;
             return View();
+        }
+
+        private List<SelectListItem> Get客戶分類清單()
+        {
+            return new List<SelectListItem>
+            {
+                new SelectListItem { Text = "S級", Value = "S" },
+                new SelectListItem { Text = "A級", Value = "A" },
+                new SelectListItem { Text = "B級", Value = "B" },
+                new SelectListItem { Text = "C級", Value = "C" }
+            };
         }
     }
 }

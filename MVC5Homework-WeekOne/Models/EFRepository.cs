@@ -37,14 +37,14 @@ namespace MVC5Homework_WeekOne.Models
             ObjectSet.Add(entity);
         }
 
-        public virtual void Update(T entyty)
-        {
-            UnitOfWork.Context.Entry(entyty).State = EntityState.Modified;
-        }
-
         public virtual void Delete(T entity)
         {
             ObjectSet.Remove(entity);
+        }
+
+        public virtual void Update(T entity)
+        {
+            UnitOfWork.Context.Entry(entity).State = EntityState.Modified;
         }
     }
 }

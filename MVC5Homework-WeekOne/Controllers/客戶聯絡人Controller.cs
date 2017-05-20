@@ -1,25 +1,27 @@
-﻿using System;
+﻿using MVC5Homework_WeekOne.Models;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using MVC5Homework_WeekOne.Models;
 using System.Web.UI;
+using System;
+using MVC5Homework_WeekOne.Controllers.ActionFilters;
 
 namespace MVC5Homework_WeekOne.Controllers
 {
     public class 客戶聯絡人Controller : Controller
     {
-        private 客戶資料Entities db = new 客戶資料Entities();
+        客戶聯絡人Repository repo = RepositoryHelper.Get客戶聯絡人Repository();
+        客戶資料Repository repo2 = RepositoryHelper.Get客戶資料Repository();
 
         // GET: 客戶聯絡人
-        public ActionResult Index()
+        [TimeSpentActionFilter]
+        public ActionResult Index(string 查詢條件_名稱, string 查詢條件_職稱)
         {
-            var 客戶聯絡人 = db.客戶聯絡人.Where(人 => 人.是否已刪除 == false).Include(客 => 客.客戶資料);
-            return View(客戶聯絡人.ToList());
+            var data = repo.All(查詢條件_名稱, 查詢條件_職稱);
+            ViewData.Model = data;
+            ViewBag.職稱清單 = Get職稱清單();
+            return View();
         }
 
         // GET: 客戶聯絡人/Details/5
@@ -29,12 +31,13 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
-            if (客戶聯絡人 == null)
+            var data = repo.GetClientContact(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶聯絡人);
+            ViewData.Model = data;
+            return View();
         }
 
         // GET: 客戶聯絡人/Create
@@ -43,7 +46,8 @@ namespace MVC5Homework_WeekOne.Controllers
             //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱");
             客戶聯絡人 客戶聯絡人 = new 客戶聯絡人();
             InitDropDownList(客戶聯絡人);
-            return View(客戶聯絡人);
+            ViewData.Model = 客戶聯絡人;
+            return View();
         }
 
         // POST: 客戶聯絡人/Create
@@ -55,13 +59,13 @@ namespace MVC5Homework_WeekOne.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.客戶聯絡人.Add(客戶聯絡人);
-                db.SaveChanges();
+                repo.Add(客戶聯絡人);
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
             InitDropDownList(客戶聯絡人);
-            return View(客戶聯絡人);
+            ViewData.Model = 客戶聯絡人;
+            return View();
         }
 
         // GET: 客戶聯絡人/Edit/5
@@ -71,14 +75,14 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
-            if (客戶聯絡人 == null)
+            var data = repo.GetClientContact(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
-            InitDropDownList(客戶聯絡人);
-            return View(客戶聯絡人);
+            InitDropDownList(data);
+            ViewData.Model = data;
+            return View();
         }
 
         // POST: 客戶聯絡人/Edit/5
@@ -90,21 +94,19 @@ namespace MVC5Homework_WeekOne.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(客戶聯絡人).State = EntityState.Modified;
-                db.SaveChanges();
+                repo.Update(客戶聯絡人);
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
             InitDropDownList(客戶聯絡人);
-            return View(客戶聯絡人);
+            ViewData.Model = 客戶聯絡人;
+            return View();
         }
 
         [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
         public ActionResult 檢查Email是否重複([Bind(Include = "Id,客戶Id,職稱,姓名,Email,手機,電話")] 客戶聯絡人 客戶聯絡人)
         {            
-            return Json(
-                (db.客戶聯絡人.Where( 人 => 人.Email == 客戶聯絡人.Email && 人.Id != 客戶聯絡人.Id)
-                            .FirstOrDefault() == null), JsonRequestBehavior.AllowGet);
+            return Json(!repo.IsEmailExists(客戶聯絡人), JsonRequestBehavior.AllowGet);
         }
 
         // GET: 客戶聯絡人/Delete/5
@@ -114,12 +116,13 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
-            if (客戶聯絡人 == null)
+            var data = repo.GetClientContact(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶聯絡人);
+            ViewData.Model = data;
+            return View();
         }
 
         // POST: 客戶聯絡人/Delete/5
@@ -127,29 +130,30 @@ namespace MVC5Homework_WeekOne.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶聯絡人 客戶聯絡人 = db.客戶聯絡人.Find(id);
-            db.客戶聯絡人.Remove(客戶聯絡人);
-            db.SaveChanges();
+            var data = repo.GetClientContact(id);
+            repo.Delete(data);
+            repo.UnitOfWork.Commit();
             return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
 
         private void InitDropDownList(客戶聯絡人 客戶聯絡人)
         {
-            List<SelectListItem> 客戶清單 = new List<SelectListItem>();
-            foreach (客戶資料 客 in db.客戶資料.Where(客 => 客.是否已刪除 == false))
+            List<SelectListItem> data = new List<SelectListItem>();
+            foreach (客戶資料 客 in repo2.All())
             {
-                客戶清單.Add(new SelectListItem { Text = 客.客戶名稱, Value = 客.Id.ToString() });
+                data.Add(new SelectListItem { Text = 客.客戶名稱, Value = 客.Id.ToString() });
             }
-            客戶聯絡人.客戶清單 = 客戶清單;
+            客戶聯絡人.客戶清單 = data;
+        }
+
+        private List<SelectListItem> Get職稱清單()
+        {
+            var data = new List<SelectListItem>();
+            foreach (var contact in repo.GetDistinctByTitle())
+            {
+                data.Add(new SelectListItem { Text = contact.職稱, Value = contact.職稱 });
+            }
+            return data;
         }
     }
 }

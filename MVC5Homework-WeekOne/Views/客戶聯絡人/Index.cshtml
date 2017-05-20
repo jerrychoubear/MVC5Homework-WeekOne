@@ -2,13 +2,35 @@
 
 @{
     ViewBag.Title = "客戶聯絡人";
+    var 職稱清單 = ViewBag.職稱清單 as List<SelectListItem>;
 }
 
 <h2>客戶聯絡人</h2>
+<br />
+<script src="~/Scripts/jquery-1.10.2.js"></script>
+@using (Html.BeginForm("Index", "客戶聯絡人", FormMethod.Post, new { id = "formSearch", @class = "form-inline" }))
+{
+    <label for="查詢條件_名稱">姓名</label>
+    <div class="form-group">
+        @Html.TextBox("查詢條件_名稱", null, new { @id = "查詢條件_名稱", @class = "form-control" })
+    </div>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+    <label for="查詢條件_職稱" class="col-form-label">職稱</label>
+    <div class="form-group">
+        @Html.DropDownList("查詢條件_職稱", 職稱清單, "全部", new { @id = "查詢條件_職稱", @class = "form-control" })
+    </div>
+}
+<br />
+<div class="form-inline">
+    <div class="form-group">
+        <span id="btnFind" class="btn btn-primary">Find</span>
+    </div>
+
+    <div class="form-group">
+        @Html.ActionLink("Create New", "Create", null, new { @class = "btn btn-success" })
+    </div>
+</div>
+<br />
 <table class="table">
     <tr>
         <th>
@@ -53,11 +75,18 @@
             @Html.DisplayFor(modelItem => item.客戶資料.客戶名稱)
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+            @Html.ActionLink("Edit", "Edit", new { id = item.Id }, htmlAttributes: new { @class = "btn btn-warning" })
+            @Html.ActionLink("Details", "Details", new { id = item.Id }, htmlAttributes: new { @class = "btn btn-info" })
+            @Html.ActionLink("Delete", "Delete", new { id = item.Id }, htmlAttributes: new { @class = "btn btn-danger" })
         </td>
     </tr>
 }
 
 </table>
+<script type="text/javascript">
+    $(function () {
+        var Submit = function () { $('#formSearch').submit(); };
+        $('#btnFind').click(Submit);
+        $('#查詢條件_職稱').change(Submit)
+    });
+</script>

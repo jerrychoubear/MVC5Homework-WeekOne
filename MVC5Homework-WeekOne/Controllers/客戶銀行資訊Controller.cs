@@ -1,12 +1,7 @@
-﻿using System;
+﻿using MVC5Homework_WeekOne.Models;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
-using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using MVC5Homework_WeekOne.Models;
 
 namespace MVC5Homework_WeekOne.Controllers
 {

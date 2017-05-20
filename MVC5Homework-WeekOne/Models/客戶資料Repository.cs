@@ -6,24 +6,19 @@ namespace MVC5Homework_WeekOne.Models
     {
         public override IQueryable<客戶資料> All()
         {           
-            return base.All().Where(a => !a.是否已刪除);
+            return Where(a => !a.是否已刪除).OrderBy(a => a.Id);
         }
 
-        public IQueryable<客戶資料> All(bool isDeleted)
-        {          
-            if (isDeleted)
-            {
-                return this.All();
-            }
-            else
-            {
-                return base.All();
-            }
+        public IQueryable<客戶資料> All(string ClientName, string ClientClass)
+        {
+            return All()
+                .Where(a => (ClientName ?? string.Empty).Length == 0 || a.客戶名稱.Contains(ClientName))
+                .Where(a => (ClientClass ?? string.Empty).Length == 0 || a.客戶分類 == ClientClass);
         }
 
         public 客戶資料 GetClient(int id)
         {
-            return this.All().FirstOrDefault(a => a.Id == id);
+            return All().FirstOrDefault(a => a.Id == id);
         }
     }
 

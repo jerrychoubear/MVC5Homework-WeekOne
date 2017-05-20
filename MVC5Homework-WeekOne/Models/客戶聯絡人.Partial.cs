@@ -10,6 +10,8 @@ namespace MVC5Homework_WeekOne.Models
     public partial class 客戶聯絡人
     {
         public List<SelectListItem> 客戶清單 { get; set; }
+
+        public List<SelectListItem> 職稱清單 { get; set; }
     }
     
     public partial class 客戶聯絡人MetaData
