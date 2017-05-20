@@ -12,13 +12,15 @@ namespace MVC5Homework_WeekOne.Controllers
 {
     public class 客戶銀行資訊Controller : Controller
     {
-        private 客戶資料Entities db = new 客戶資料Entities();
+        客戶銀行資訊Repository repo = RepositoryHelper.Get客戶銀行資訊Repository();
+        客戶資料Repository repo2 = RepositoryHelper.Get客戶資料Repository();
 
         // GET: 客戶銀行資訊
         public ActionResult Index()
         {
-            var 客戶銀行資訊 = db.客戶銀行資訊.Where(銀 => 銀.是否已刪除 == false).Include(客 => 客.客戶資料);
-            return View(客戶銀行資訊.ToList());
+            var data = repo.All();
+            ViewData.Model = data;
+            return View();
         }
 
         // GET: 客戶銀行資訊/Details/5
@@ -28,12 +30,13 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
-            if (客戶銀行資訊 == null)
+            var data = repo.GetClientBank(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶銀行資訊);
+            ViewData.Model = data;
+            return View();
         }
 
         // GET: 客戶銀行資訊/Create
@@ -54,11 +57,10 @@ namespace MVC5Homework_WeekOne.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.客戶銀行資訊.Add(客戶銀行資訊);
-                db.SaveChanges();
+                repo.Add(客戶銀行資訊);
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
             InitDropDownList(客戶銀行資訊);
             return View(客戶銀行資訊);
         }
@@ -70,14 +72,13 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
-            if (客戶銀行資訊 == null)
+            var data = repo.GetClientBank(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
-            InitDropDownList(客戶銀行資訊);
-            return View(客戶銀行資訊);
+            InitDropDownList(data);
+            return View(data);
         }
 
         // POST: 客戶銀行資訊/Edit/5
@@ -89,11 +90,10 @@ namespace MVC5Homework_WeekOne.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.Entry(客戶銀行資訊).State = EntityState.Modified;
-                db.SaveChanges();
+                repo.Update(客戶銀行資訊);
+                repo.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
-            //ViewBag.客戶Id = new SelectList(db.客戶資料.Where(c => c.是否已刪除 == false), "Id", "客戶名稱", 客戶銀行資訊.客戶Id);
             InitDropDownList(客戶銀行資訊);
             return View(客戶銀行資訊);
         }
@@ -105,12 +105,12 @@ namespace MVC5Homework_WeekOne.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
-            if (客戶銀行資訊 == null)
+            var data = repo.GetClientBank(id.Value);
+            if (data == null)
             {
                 return HttpNotFound();
             }
-            return View(客戶銀行資訊);
+            return View(data);
         }
 
         // POST: 客戶銀行資訊/Delete/5
@@ -118,25 +118,16 @@ namespace MVC5Homework_WeekOne.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶銀行資訊 客戶銀行資訊 = db.客戶銀行資訊.Find(id);
-            db.客戶銀行資訊.Remove(客戶銀行資訊);
-            db.SaveChanges();
+            var data = repo.GetClientBank(id);
+            repo.Delete(data);
+            repo.UnitOfWork.Commit();
             return RedirectToAction("Index");
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
         }
 
         private void InitDropDownList(客戶銀行資訊 客戶銀行資訊)
         {
             List<SelectListItem> 客戶清單 = new List<SelectListItem>();
-            foreach (客戶資料 客 in db.客戶資料.Where(客 => 客.是否已刪除 == false))
+            foreach (客戶資料 客 in repo2.All())
             {
                 客戶清單.Add(new SelectListItem { Text = 客.客戶名稱, Value = 客.Id.ToString() });
             }
